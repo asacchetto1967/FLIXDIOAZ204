@@ -45,6 +45,18 @@ git commit -m "Initial commit: Netflix Catalog Manager with Azure Functions and 
 # git push -u origin main
 ```
 
+## 🌐 Configuração de CORS
+
+Para que o navegador permita que o frontend (Streamlit) acesse as suas Azure Functions, você deve configurar o **CORS** (Cross-Origin Resource Sharing):
+
+- **No Portal do Azure**: Vá até a sua Function App -> API -> CORS e adicione a URL do seu frontend (ex: `http://localhost:8501`).
+- **Localmente**: Adicione a seção `Host` no seu `local.settings.json`:
+  ```json
+  "Host": {
+    "CORS": "*"
+  }
+  ```
+
 ## 🌐 Configuração do API Management (APIM)
 
 Para configurar o APIM `apim-flixdioaz204` para apontar para as suas funções, primeiro você deve publicar as funções no Azure. Após a publicação, você pode usar os seguintes comandos da Azure CLI:
