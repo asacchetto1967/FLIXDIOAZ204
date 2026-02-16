@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +19,15 @@ namespace FlixDioAZ204.Functions
         [Function("fnGetMovieDetails")]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "movie/{id}")] HttpRequest req,
+            string id,
             [CosmosDBInput(
                 databaseName: "%DatabaseName%",
                 containerName: "%ContainerNameMovies%",
                 Connection = "CosmosDBConnectionString",
-                SqlQuery = "SELECT * FROM c WHERE c.id = {id}")] IEnumerable<Movie> movies)
+                Id = "{id}",
+                PartitionKey = "{id}")] Movie movie)
         {
-            _logger.LogInformation("Retrieving movie details from CosmosDB.");
-
-            var movie = movies.FirstOrDefault();
+            _logger.LogInformation($"Retrieving movie details for ID: {id}");
 
             if (movie == null)
             {

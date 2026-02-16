@@ -3,8 +3,8 @@ import requests
 import os
 
 # Configurações da API (Substitua pela URL do seu APIM ou Function App)
-BASE_URL = "http://localhost:7071/api" # Ou a URL do seu APIM
-API_KEY = "SUA_CHAVE_AQUI" # Se necessário
+BASE_URL = os.getenv("AZURE_FUNCTION_URL", "http://localhost:7071/api")
+API_KEY = os.getenv("AZURE_FUNCTION_KEY", "[YOUR_FUNCTION_KEY]")
 
 st.set_page_config(page_title="Netflix Catalog Manager", layout="wide")
 
@@ -25,34 +25,40 @@ if choice == "Adicionar Novo Filme":
         video_file = st.file_uploader("Upload do Vídeo", type=["mp4", "mov", "avi"])
         thumb_file = st.file_uploader("Upload do Thumbnail", type=["jpg", "png", "jpeg"])
         
-        submitted = st.form_submit_content("Salvar Filme")
+        submitted = st.form_submit_button("Salvar Filme")
         
         if submitted:
-            # 1. Upload Video
-            if video_file:
-                files = {"file": (video_file.name, video_file.getvalue())}
-                v_res = requests.post(f"{BASE_URL}/video", files=files)
-                video_url = v_res.json().get("url")
-            
-            # 2. Upload Thumbnail
-            if thumb_file:
-                files = {"file": (thumb_file.name, thumb_file.getvalue())}
-                t_res = requests.post(f"{BASE_URL}/thumbnail", files=files)
-                thumb_url = t_res.json().get("url")
-            
-            # 3. Save Metadata to CosmosDB
-            payload = {
-                "title": title,
-                "year": year,
-                "videoUrl": video_url,
-                "thumbUrl": thumb_url
-            }
-            res = requests.post(f"{BASE_URL}/movie", json=payload)
-            
-            if res.status_code == 200:
-                st.success(f"Filme '{title}' adicionado com sucesso!")
+            if not title or not year:
+                st.error("Título e ano são obrigatórios.")
+            elif not video_file or not thumb_file:
+                st.error("Vídeo e thumbnail são obrigatórios.")
             else:
-                st.error("Erro ao salvar no banco de dados.")
+                try:
+                    # 1. Upload Video
+                    files = {"file": (video_file.name, video_file.getvalue())}
+                    v_res = requests.post(f"{BASE_URL}/video", files=files)
+                    v_res.raise_for_status()
+                    video_url = v_res.json().get("url")
+                    
+                    # 2. Upload Thumbnail
+                    files = {"file": (thumb_file.name, thumb_file.getvalue())}
+                    t_res = requests.post(f"{BASE_URL}/thumbnail", files=files)
+                    t_res.raise_for_status()
+                    thumb_url = t_res.json().get("url")
+                    
+                    # 3. Save Metadata to CosmosDB
+                    payload = {
+                        "title": title,
+                        "year": year,
+                        "videoUrl": video_url,
+                        "thumbUrl": thumb_url
+                    }
+                    res = requests.post(f"{BASE_URL}/movie", json=payload)
+                    res.raise_for_status()
+                    
+                    st.success(f"Filme '{title}' adicionado com sucesso!")
+                except requests.exceptions.RequestException as e:
+                    st.error(f"Erro ao processar requisição: {str(e)}")
 
 elif choice == "Listar Filmes":
     st.subheader("📂 Catálogo Completo")
