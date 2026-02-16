@@ -24,26 +24,7 @@ Este projeto é um Gerenciador de Catálogos da Netflix desenvolvido com **Azure
    func start
    ```
 
-## 📦 Inicialização do Repositório GitHub
 
-Para transformar esta pasta em um repositório e enviá-lo para o GitHub, siga estes passos:
-
-```bash
-# Inicializar o git
-git init
-
-# Adicionar todos os arquivos (o .gitignore evitará arquivos desnecessários)
-git add .
-
-# Criar o commit inicial
-git commit -m "Initial commit: Netflix Catalog Manager with Azure Functions and CosmosDB"
-
-# Adicionar o seu repositório remoto (substitua URL_DO_SEU_REPOSITORIO)
-# git remote add origin URL_DO_SEU_REPOSITORIO
-
-# Enviar para o GitHub
-# git push -u origin main
-```
 
 ## 🌐 Configuração do API Management (APIM)
 
@@ -66,4 +47,4 @@ az apim api create --resource-group $RESOURCE_GROUP \
     --specification-format "OpenApi"
 ```
 
-*Nota: Para que o comando acima funcione com `swagger.json`, você pode adicionar o pacote `Microsoft.Azure.WebJobs.Extensions.OpenApi` ao seu projeto.*
+*Nota: Para que o comando acima funcione com `swagger.json`, adicione o pacote `Microsoft.Azure.WebJobs.Extensions.OpenApi` ao seu projeto.*
